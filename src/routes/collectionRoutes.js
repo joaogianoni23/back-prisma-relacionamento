@@ -11,7 +11,7 @@ collectionsRouter.get("/", CollectionController.getAllCollections);
 //collectionsRouter.get("/:id", CollectionController.getCollectionById);
 
 // POST /coleções - Criar uma nova coleção
-//collectionsRouter.post("/", CollectionController.createCollection);
+collectionsRouter.post("/", CollectionController.createCollection);
 
 // PUT /coleções/:id - Atualizar uma coleção
 //collectionsRouter.put("/:id", CollectionController.updateCollection);

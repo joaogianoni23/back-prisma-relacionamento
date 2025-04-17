@@ -7,6 +7,10 @@ class CollectionModel {
       orderBy: {
         createdAt: "desc",
       },
+
+      include: {
+        cards: true,
+      },
     });
 
     console.log(collections);
