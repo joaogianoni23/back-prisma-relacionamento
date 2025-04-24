@@ -1,4 +1,5 @@
 import CardModel from "../models/cardModel.js";
+import CollectionModel from "../models/collectionModel.js"; // Importação para validação do collectionId
 
 class CardController {
   // GET /api/cartas
@@ -7,8 +8,8 @@ class CardController {
       const cards = await CardModel.findAll();
       res.json(cards);
     } catch (error) {
-      console.error("Erro ao buscar carta:", error);
-      res.status(500).json({ error: "Erro ao buscar carta" });
+      console.error("Erro ao buscar cartas:", error);
+      res.status(500).json({ error: "Erro ao buscar cartas" });
     }
   }
 
@@ -40,19 +41,28 @@ class CardController {
         attackPoints,
         defensePoints,
         imageUrl,
+        collectionId,
       } = req.body;
-
+ console.log(name, rarity, attackPoints, defensePoints, imageUrl, collectionId);
       // Verifica se todos os campos da carta foram fornecidos
       if (
         !name ||
         !rarity ||
         !attackPoints ||
         !defensePoints ||
-        !imageUrl 
+        !collectionId
       ) {
         return res
           .status(400)
           .json({ error: "Todos os campos são obrigatórios" });
+      }
+
+      // Verifica se o collectionId existe
+      const collectionExists = await CollectionModel.findById(collectionId);
+      if (!collectionExists) {
+        return res
+          .status(400)
+          .json({ error: "CollectionId inválido ou não encontrado" });
       }
 
       // Criar a nova carta
@@ -61,7 +71,8 @@ class CardController {
         rarity,
         attackPoints,
         defensePoints,
-        imageUrl
+        imageUrl,
+        collectionId
       );
 
       if (!newCard) {
@@ -70,6 +81,11 @@ class CardController {
 
       res.status(201).json(newCard);
     } catch (error) {
+      if (error.code === "P2003") {
+        return res
+          .status(400)
+          .json({ error: "CollectionId inválido ou não encontrado" });
+      }
       console.error("Erro ao criar carta:", error);
       res.status(500).json({ error: "Erro ao criar carta" });
     }
@@ -85,7 +101,18 @@ class CardController {
         attackPoints,
         defensePoints,
         imageUrl,
+        collectionId,
       } = req.body;
+
+      // Verifica se o collectionId existe, se fornecido
+      if (collectionId) {
+        const collectionExists = await CollectionModel.findById(collectionId);
+        if (!collectionExists) {
+          return res
+            .status(400)
+            .json({ error: "CollectionId inválido ou não encontrado" });
+        }
+      }
 
       // Atualizar a carta
       const updatedCard = await CardModel.update(
@@ -94,11 +121,12 @@ class CardController {
         rarity,
         attackPoints,
         defensePoints,
-        imageUrl
+        imageUrl,
+        collectionId
       );
 
       if (!updatedCard) {
-        return res.status(404).json({ error: "Carta não encontrado" });
+        return res.status(404).json({ error: "Carta não encontrada" });
       }
 
       res.json(updatedCard);
@@ -117,7 +145,7 @@ class CardController {
       const result = await CardModel.delete(id);
 
       if (!result) {
-        return res.status(404).json({ error: "Carta não encontrado" });
+        return res.status(404).json({ error: "Carta não encontrada" });
       }
 
       res.status(204).end(); // Resposta sem conteúdo

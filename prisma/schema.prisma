@@ -67,7 +67,7 @@ model Card {
   defensePoints Int
   imageUrl String? 
 
-  collectionId Int @unique
+  collectionId Int 
   collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
