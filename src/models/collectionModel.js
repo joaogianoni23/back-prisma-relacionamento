@@ -44,6 +44,7 @@ class CollectionModel {
 
   // Atualizar uma coleção
   async update(
+    id,
     name,
         description,
         releaseYear,

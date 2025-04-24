@@ -43,7 +43,6 @@ class CollectionController {
       // Verifica se todos os campos da coleção foram fornecidos
       if (
         !name ||
-        !description ||
         !releaseYear 
       ) {
         return res
@@ -107,7 +106,7 @@ class CollectionController {
       const result = await CollectionModel.delete(id);
 
       if (!result) {
-        return res.status(404).json({ error: "Coleção não encontrado" });
+        return res.status(404).json({ error: "Coleção não encontrada!" });
       }
 
       res.status(204).end(); // Resposta sem conteúdo
