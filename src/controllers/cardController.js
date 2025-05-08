@@ -4,8 +4,14 @@ import CollectionModel from "../models/collectionModel.js"; // Importação para
 class CardController {
   // GET /api/cartas
   async getAllCards(req, res) {
+    const rarity = req.query.rarity; // Obter o parâmetro de consulta "rarity" da URL
+    console.log("Raridade:", rarity);
+
+    const attack = req.query.attack; // Obter o parâmetro de consulta "attack" da URL
+    console.log("Ataque:", attack);
+
     try {
-      const cards = await CardModel.findAll();
+      const cards = await CardModel.findAll(rarity, attack);
       res.json(cards);
     } catch (error) {
       console.error("Erro ao buscar cartas:", error);
