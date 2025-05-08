@@ -2,7 +2,16 @@ import prisma from "../../prisma/prisma.js";
 
 class CardModel {
   // Obter todas as cartas
-  async findAll(rarity, attack) {
+  async findAll(rarity, attack, page, limit, name) {
+    if (Number(page) < 1) {
+      page = 1;
+    }
+
+    if (Number(limit) < 1 || Number(limit) > 100) {
+      limit = 10;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
 
     const where = {}
 
@@ -15,6 +24,12 @@ class CardModel {
         gte: Number(attack), 
       }
     }
+
+    if (name) {
+      where.name = {
+      contains: name,
+    };
+  }
 
     // Raridade Ultra Raro
     // Como fica maior ou igual que em inglês? Resposta: greather than
@@ -37,24 +52,25 @@ class CardModel {
         rarity: rarity,
       }, */
 
+      skip,
+      take: Number(limit),
       where,
       orderBy: {
         createdAt: "desc",
       },
       include: {
-        collection: {
-          select: {
-            name: true,
-            description: true, 
-            releaseYear: true,
-          }
-        }
-      }
+        collection: true, // Incluir a coleção associada à cart
+      },
     });
+
+    const totalExibidos = cards.length; // Total de cartas exibidas na página atual
+    const totalGeral = await prisma.card.count({
+      where,
+    }); // Total de cartas no banco de dados
 
     //console.log(cards);
 
-    return cards;
+    return { cards, totalExibidos, totalGeral };
   }
 
   // Obter uma carta pelo ID
